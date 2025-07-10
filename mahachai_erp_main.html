@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahachai Group - ระบบ ERP ครบวงจร</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --mahachai-orange: #FF8C42;
+            --mahachai-brown: #8B4513;
+            --primary-color: #2c3e50;
+            --secondary-color: var(--mahachai-orange);
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #16a085;
+            --light-bg: #ecf0f1;
+            --white: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --border-color: #ddd;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--mahachai-brown) 0%, #5D4037 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .logo-text {
+            background: linear-gradient(45deg, var(--mahachai-orange), white);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid var(--mahachai-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--mahachai-brown) 0%, #5D4037 100%);
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .company-slogan {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Main App Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--mahachai-brown) 0%, #5D4037 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            margin: 2px 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--mahachai-orange);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255,138,66,0.2);
+            color: white;
+            border-left-color: var(--mahachai-orange);
+            box-shadow: inset 0 0 10px rgba(255,138,66,0.1);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, white 0%, #f8f9fa 100%);
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--mahachai-orange);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--mahachai-orange), #FF6B35);
+            border-radius: 25px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255,138,66,0.3);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Components */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--mahachai-orange) 0%, #FF6B35 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255,138,66,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,138,66,0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #C0392B 100%);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--mahachai-orange);
+            box-shadow: 0 0 0 3px rgba(255,138,66,0.1);
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--mahachai-orange);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success-color);
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        /* Content Area */
+        .content-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            min-height: 400px;
+        }
+
+        /* Mobile Responsive */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--mahachai-orange);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255,138,66,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        /* Development Section */
+        .development-notice {
+            background: linear-gradient(135deg, #fff3cd 0%, #fef9e7 100%);
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="logo-text">Mahachai<br>Group</div>
+            <div class="loading-spinner"></div>
+            <p>กำลังโหลดระบบ...</p>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()" id="mobile-toggle" style="display: none;">☰</button>
+
+    <!-- Login Page -->
+    <div id="login-page" class="login-container" style="display: none;">
+        <div class="login-box">
+            <div class="logo-container">
+                <div class="logo-text" style="background: linear-gradient(45deg, var(--mahachai-orange), var(--mahachai-brown)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 36px; font-weight: 700; margin-bottom: 10px;">Mahachai<br>Group</div>
+                <div class="company-slogan">สินค้าคุณภาพ สะอาด ราคาประหยัด</div>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>ชื่อผู้ใช้งาน</label>
+                    <input type="text" class="form-control" id="username" placeholder="กรอกชื่อผู้ใช้งาน" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>รหัสผ่าน</label>
+                    <input type="password" class="form-control" id="password" placeholder="กรอกรหัสผ่าน" required>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <span>🔐</span> เข้าสู่ระบบ
+                    </button>
+                </div>
+            </form>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: var(--text-light);">
+                <strong>บัญชีทดสอบ:</strong><br>
+                Admin: admin / admin123<br>
+                Manager: manager / manager123<br>
+                Accountant: account / account123
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="app-container" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container" style="background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                    <div class="logo-text" style="font-size: 24px;">Mahachai<br>Group</div>
+                </div>
+                <div class="company-slogan" style="font-size: 12px; color: rgba(255,255,255,0.8);">สินค้าคุณภาพ สะอาด ราคาประหยัด</div>
+            </div>
+            
+            <nav class="nav-menu" id="nav-menu">
+                <a href="#" class="nav-item active" onclick="navigateTo('dashboard', this); return false;" data-module="dashboard">
+                    <span class="nav-icon">🏠</span>
+                    <span>หน้าหลัก</span>
+                </a>
+                <a href="#" class="nav-item" onclick="navigateTo('purchase', this); return false;" data-module="purchase">
+                    <span class="nav-icon">📄</span>
+                    <span>บันทึกเอกสารซื้อ</span>
+                </a>
+                <a href="#" class="nav-item" onclick="navigateTo('supplier', this); return false;" data-module="supplier">
+                    <span class="nav-icon">👥</span>
+                    <span>จัดการ Supplier</span>
+                </a>
+                <a href="#" class="nav-item" onclick="navigateTo('sales', this); return false;" data-module="sales">
+                    <span class="nav-icon">💰</span>
+                    <span>บันทึกยอดขาย</span>
+                </a>
+                <a href="#" class="nav-item" onclick="navigateTo('cheque', this); return false;" data-module="cheque">
+                    <span class="nav-icon">💳</span>
+                    <span>จัดการเช็ค</span>
+                </a>
+                <a href="#" class="nav-item" onclick="navigateTo('user', this); return false;" data-module="user">
+                    <span class="nav-icon">👤</span>
+                    <span>จัดการผู้ใช้งาน</span>
+                </a>
+                <a href="#" class="nav-item" onclick="navigateTo('reports', this); return false;" data-module="reports">
+                    <span class="nav-icon">📊</span>
+                    <span>รายงาน</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="main-header">
+                <h1 class="page-title">
+                    <span id="page-icon">🏠</span>
+                    <span id="page-title-text">Dashboard</span>
+                </h1>
+                <div class="header-actions">
+                    <div class="user-info" id="user-info">
+                        <div class="user-avatar">A</div>
+                        <div>
+                            <div>Admin</div>
+                            <div style="font-size: 12px; opacity: 0.8;">ผู้ดูแลระบบ</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">
+                        <span>🚪</span> ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Container -->
+            <div id="content-container">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <h3>ยอดซื้อเดือนนี้</h3>
+                            <div class="stat-value">฿ 850,000</div>
+                            <div class="stat-change">
+                                <span>↑ 15%</span> จากเดือนที่แล้ว
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>ยอดขายเดือนนี้</h3>
+                            <div class="stat-value">฿ 1,250,000</div>
+                            <div class="stat-change">
+                                <span>↑ 8%</span> จากเดือนที่แล้ว
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>เจ้าหนี้คงค้าง</h3>
+                            <div class="stat-value">฿ 185,000</div>
+                            <div class="stat-change" style="color: var(--danger-color);">
+                                <span>↑ 5%</span> จากเดือนที่แล้ว
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3>ลูกหนี้คงค้าง</h3>
+                            <div class="stat-value">฿ 320,000</div>
+                            <div class="stat-change">
+                                <span>↓ 3%</span> จากเดือนที่แล้ว
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-container">
+                        <h2 style="margin-bottom: 20px; color: var(--primary-color);">🎯 ระบบ ERP Mahachai Group</h2>
+                        <p style="font-size: 16px; line-height: 1.8; color: var(--text-dark);">
+                            ยินดีต้อนรับสู่ระบบจัดการธุรกิจครบวงจรสำหรับ Mahachai Group 
+                            ระบบนี้รวบรวมการทำงานหลักทั้งหมดในการดำเนินธุรกิจ ตั้งแต่การซื้อสินค้า การจัดการ Supplier 
+                            การบันทึกยอดขาย การจัดการเช็คจ่าย และการจัดการผู้ใช้งาน
+                        </p>
+                        
+                        <div style="margin-top: 30px;">
+                            <h3 style="color: var(--mahachai-orange); margin-bottom: 15px;">🚀 ฟีเจอร์หลัก</h3>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>📄 บันทึกเอกสารซื้อ:</strong> จัดการใบสั่งซื้อและการชำระเงิน</li>
+                                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>👥 จัดการ Supplier:</strong> ข้อมูลผู้ขายและบัญชีธนาคาร</li>
+                                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>💰 บันทึกยอดขาย:</strong> ติดตามยอดขายรายวันและรายเดือน</li>
+                                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>💳 จัดการเช็ค:</strong> ระบบเช็คจ่ายแยกตามบัญชี</li>
+                                <li style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>👤 จัดการผู้ใช้งาน:</strong> ระบบสิทธิ์และการเข้าถึง</li>
+                                <li style="padding: 8px 0;"><strong>📊 รายงาน:</strong> สรุปข้อมูลทางธุรกิจ</li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); border-radius: 12px; border: 2px solid #4caf50;">
+                            <h4 style="color: var(--success-color); margin-bottom: 10px;">💡 วิธีการใช้งาน</h4>
+                            <p style="margin: 0; color: #2e7d32;">
+                                เริ่มต้นโดยการเลือกเมนูจากแถบด้านซ้าย หรือใช้ปุ่ม Quick Actions ด้านล่าง 
+                                ระบบได้เตรียมข้อมูลตัวอย่างไว้ให้ทดสอบการใช้งานแล้ว
+                            </p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 30px;">
+                            <button class="btn btn-primary" onclick="navigateTo('purchase')" style="padding: 20px; flex-direction: column; gap: 10px;">
+                                <span style="font-size: 24px;">📄</span>
+                                <span>เริ่มบันทึกซื้อ</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="navigateTo('supplier')" style="padding: 20px; flex-direction: column; gap: 10px;">
+                                <span style="font-size: 24px;">👥</span>
+                                <span>จัดการ Supplier</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="navigateTo('sales')" style="padding: 20px; flex-direction: column; gap: 10px;">
+                                <span style="font-size: 24px;">💰</span>
+                                <span>บันทึกยอดขาย</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="navigateTo('cheque')" style="padding: 20px; flex-direction: column; gap: 10px;">
+                                <span style="font-size: 24px;">💳</span>
+                                <span>จัดการเช็ค</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        // Mock Database
+        const DEMO_DATA = {
+            users: {
+                'admin': {
+                    username: 'admin',
+                    password: 'admin123',
+                    displayName: 'ผู้ดูแลระบบ หลัก',
+                    role: 'admin',
+                    permissions: ['*']
+                },
+                'manager': {
+                    username: 'manager',
+                    password: 'manager123',
+                    displayName: 'คุณสมชาย ใจดี',
+                    role: 'manager',
+                    permissions: ['dashboard', 'purchase', 'supplier', 'sales', 'cheque']
+                },
+                'account': {
+                    username: 'account',
+                    password: 'account123',
+                    displayName: 'คุณสมหญิง บัญชีดี',
+                    role: 'accountant',
+                    permissions: ['dashboard', 'purchase', 'supplier', 'cheque']
+                }
+            }
+        };
+
+        // Application State
+        let currentUser = null;
+        let currentModule = 'dashboard';
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            console.log('Initializing Mahachai ERP System...');
+            
+            // Show loading screen
+            document.getElementById('loading-screen').style.display = 'flex';
+            
+            // Simulate loading time
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Hide loading screen
+            document.getElementById('loading-screen').style.display = 'none';
+            
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            } else {
+                showLoginPage();
+            }
+            
+            console.log('System initialized successfully');
+        }
+
+        function showLoginPage() {
+            document.getElementById('login-page').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('mobile-toggle').style.display = 'none';
+            
+            // Add login form handler
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        }
+
+        function showMainApp() {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('mobile-toggle').style.display = 'block';
+            
+            updateUserInfo();
+            navigateTo('dashboard');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const user = DEMO_DATA.users[username];
+            
+            if (!user) {
+                showToast('ไม่พบผู้ใช้งานนี้ในระบบ', 'error');
+                return;
+            }
+            
+            if (user.password !== password) {
+                showToast('รหัสผ่านไม่ถูกต้อง', 'error');
+                return;
+            }
+            
+            // Login successful
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            showMainApp();
+            showToast(`ยินดีต้อนรับ ${user.displayName}`, 'success');
+        }
+
+        function updateUserInfo() {
+            const userInfoEl = document.getElementById('user-info');
+            if (userInfoEl && currentUser) {
+                userInfoEl.innerHTML = `
+                    <div class="user-avatar">${currentUser.displayName.charAt(0)}</div>
+                    <div>
+                        <div>${currentUser.displayName}</div>
+                        <div style="font-size: 12px; opacity: 0.8;">${currentUser.role}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function navigateTo(module, navElement) {
+            currentModule = module;
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (navElement) {
+                navElement.classList.add('active');
+            } else {
+                const targetNav = document.querySelector(`[data-module="${module}"]`);
+                if (targetNav) {
+                    targetNav.classList.add('active');
+                }
+            }
+            
+            // Update page title
+            const moduleConfig = {
+                dashboard: { icon: '🏠', title: 'Dashboard' },
+                purchase: { icon: '📄', title: 'บันทึกเอกสารซื้อ' },
+                supplier: { icon: '👥', title: 'จัดการ Supplier' },
+                sales: { icon: '💰', title: 'บันทึกยอดขาย' },
+                cheque: { icon: '💳', title: 'จัดการเช็ค' },
+                user: { icon: '👤', title: 'จัดการผู้ใช้งาน' },
+                reports: { icon: '📊', title: 'รายงาน' }
+            };
+            
+            if (moduleConfig[module]) {
+                document.getElementById('page-icon').textContent = moduleConfig[module].icon;
+                document.getElementById('page-title-text').textContent = moduleConfig[module].title;
+            }
+            
+            // Load module content
+            loadModuleContent(module);
+            
+            // Close mobile menu
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        function loadModuleContent(module) {
+            const contentContainer = document.getElementById('content-container');
+            
+            // Hide dashboard content
+            const dashboardContent = document.getElementById('dashboard-content');
+            if (dashboardContent) {
+                dashboardContent.style.display = module === 'dashboard' ? 'block' : 'none';
+            }
+            
+            if (module === 'dashboard') {
+                return; // Dashboard content is already in HTML
+            }
+            
+            // Show loading for other modules
+            contentContainer.innerHTML = `
+                <div class="development-notice">
+                    <h3>🚧 ระบบ ${document.getElementById('page-title-text').textContent} อยู่ระหว่างการพัฒนา</h3>
+                    <p>ขณะนี้ระบบยังอยู่ระหว่างการพัฒนา กรุณารอการอัพเดทในเวอร์ชันถัดไป</p>
+                    <div style="margin-top: 20px;">
+                        <strong>ฟีเจอร์ที่จะมีในเร็วๆ นี้:</strong>
+                        <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                            ${getModuleFeatures(module)}
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" onclick="navigateTo('dashboard')" style="margin-top: 20px;">
+                        <span>🏠</span> กลับสู่หน้าหลัก
+                    </button>
+                </div>
+            `;
+        }
+
+        function getModuleFeatures(module) {
+            const features = {
+                purchase: `
+                    <li>บันทึกเอกสารซื้อและใบสั่งซื้อ</li>
+                    <li>การคำนวณ VAT อัตโนมัติ</li>
+                    <li>เลือกวิธีการชำระเงิน</li>
+                    <li>เชื่อมต่อกับข้อมูล Supplier</li>
+                `,
+                supplier: `
+                    <li>จัดการข้อมูล Supplier และผู้ขาย</li>
+                    <li>บันทึกบัญชีธนาคาร</li>
+                    <li>กำหนดเงื่อนไขการชำระเงิน</li>
+                    <li>ประวัติการซื้อขาย</li>
+                `,
+                sales: `
+                    <li>บันทึกยอดขายรายวันและรายเดือน</li>
+                    <li>แยกช่องทางการขาย</li>
+                    <li>สรุปเป้าหมายและผลงาน</li>
+                    <li>รายงานยอดขาย</li>
+                `,
+                cheque: `
+                    <li>จัดการเช็คจ่ายแยกตามบัญชี</li>
+                    <li>ติดตามสถานะเช็ค</li>
+                    <li>เชื่อมต่อกับเอกสารซื้อ</li>
+                    <li>รายงานเช็คคงค้าง</li>
+                `,
+                user: `
+                    <li>จัดการผู้ใช้งานและสิทธิ์</li>
+                    <li>ระบบ Authentication</li>
+                    <li>กำหนด Role และ Permission</li>
+                    <li>ประวัติการใช้งาน</li>
+                `,
+                reports: `
+                    <li>รายงานการซื้อและการขาย</li>
+                    <li>รายงานกระแสเงินสด</li>
+                    <li>รายงานลูกหนี้เจ้าหนี้</li>
+                    <li>Export เป็น Excel/PDF</li>
+                `
+            };
+            
+            return features[module] || '<li>ฟีเจอร์พิเศษต่างๆ</li>';
+        }
+
+        function logout() {
+            if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                showLoginPage();
+                showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Global click handler for mobile menu
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const toggle = document.getElementById('mobile-toggle');
+                
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
